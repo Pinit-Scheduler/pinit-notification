@@ -18,7 +18,7 @@ public class PushNotificationController {
 
     @GetMapping("/vapid")
     public String getVapidPublicKey() {
-        return "YOUR_VAPID_PUBLIC_KEY";
+        return pushService.getVapidPublicKey();
     }
 
     @PostMapping("/subscribe")
