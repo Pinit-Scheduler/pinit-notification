@@ -1,4 +1,4 @@
-package me.pinitnotification.domain;
+package me.pinitnotification.domain.push;
 
 import jakarta.persistence.*;
 
