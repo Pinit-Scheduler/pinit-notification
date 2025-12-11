@@ -1,0 +1,58 @@
+package me.pinitnotification.infra.web;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import me.pinitnotification.domain.member.MemberId;
+import me.pinitnotification.domain.member.exception.MemberNotFoundException;
+import me.pinitnotification.infra.authenticate.JwtTokenProvider;
+import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
+@Slf4j
+@Component
+public class MemberIdArgumentResolver implements HandlerMethodArgumentResolver {
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public MemberIdArgumentResolver(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.hasParameterAnnotation(MemberId.class)
+                && (Long.class.isAssignableFrom(parameter.getParameterType())
+                || long.class.isAssignableFrom(parameter.getParameterType()));
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter,
+                                  ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest,
+                                  WebDataBinderFactory binderFactory) throws Exception {
+
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        if (request == null) {
+            log.info("HttpServletRequest is null");
+            throw new MemberNotFoundException("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        String token = resolveToken(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            throw new MemberNotFoundException("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        return jwtTokenProvider.getMemberId(token);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+}
