@@ -1,6 +1,7 @@
 package me.pinitnotification.domain.push;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
 @Table(
@@ -11,6 +12,7 @@ import jakarta.persistence.*;
         )
     }
 )
+@Getter
 public class PushSubscription {
     @Id
     @GeneratedValue
