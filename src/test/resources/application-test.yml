@@ -1,0 +1,4 @@
+task:
+  grpc:
+    host: localhost
+    port: 9091
