@@ -9,14 +9,15 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Configuration
 public class FirebaseConfig {
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         try (InputStream serviceAccount =
-                     this.getClass().getClassLoader()
-                             .getResourceAsStream("firebase/pinit-firebase-key.json")) {
+                     Files.newInputStream(Path.of("./firebase/pinit-firebase-key.json"))) {
 
             if (serviceAccount == null) {
                 throw new IllegalStateException("firebase/pinit-firebase-key.json 파일을 찾을 수 없습니다.");
