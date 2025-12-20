@@ -2,3 +2,9 @@ task:
   grpc:
     host: localhost
     port: 9091
+
+path:
+  key:
+    firebase: /etc/pinit/keys/pinit-firebase-key.json
+    jwt:
+      public: /etc/pinit/keys/jwt-public-key.pem
