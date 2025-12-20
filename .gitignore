@@ -36,7 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 
-src/main/resources/firebase/**
-src/main/resources/application*.yml
+firebase/**
 src/main/resources/jwt/**
 src/main/resources/static/async-api/**
+
+keys/
+
+### secret
+k8s/secret.yaml

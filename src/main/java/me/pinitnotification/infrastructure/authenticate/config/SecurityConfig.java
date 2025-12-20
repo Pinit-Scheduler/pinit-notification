@@ -5,6 +5,7 @@ import me.pinitnotification.infrastructure.authenticate.JwtAuthenticationFilter;
 import me.pinitnotification.infrastructure.authenticate.JwtAuthenticationProvider;
 import me.pinitnotification.infrastructure.authenticate.JwtTokenProvider;
 import me.pinitnotification.infrastructure.authenticate.RsaKeyProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,10 @@ import java.security.PublicKey;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${path.key.jwt.public}")
+    private String publicKeyPath;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
@@ -33,7 +38,7 @@ public class SecurityConfig {
                         (request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing token")
                 ))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup", "/refresh", "/login/**", "/v3/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/actuator/health/liveness", "/actuator/health/readiness", "/v3/**", "/swagger-ui/**", "/async-api/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -62,7 +67,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
-        PublicKey publicKey = RsaKeyProvider.loadPublicKey("jwt/public_key.pem");
+        PublicKey publicKey = RsaKeyProvider.loadPublicKey(publicKeyPath);
         return new JwtTokenProvider(publicKey);
     }
 
