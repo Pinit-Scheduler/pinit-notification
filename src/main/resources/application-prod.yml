@@ -1,6 +1,6 @@
 task:
   grpc:
-    host: http://task-service
+    host: task-service
     port: 9090
 
 spring:
