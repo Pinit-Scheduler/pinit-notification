@@ -1,7 +1,5 @@
 package me.pinitnotification.interfaces.notification;
 
-import me.pinitnotification.application.push.PushService;
-import me.pinitnotification.domain.member.MemberId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,12 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import me.pinitnotification.application.push.PushService;
+import me.pinitnotification.domain.member.MemberId;
 import me.pinitnotification.interfaces.notification.dto.PushTokenRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/push")
@@ -39,6 +35,21 @@ public class PushNotificationController {
         return pushService.getVapidPublicKey();
     }
 
+    @GetMapping("/subscribed")
+    @Operation(
+            summary = "푸시 구독 상태 조회",
+            description = "인증된 회원이 푸시 알림을 구독 중인지 여부를 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "구독 상태 조회 완료",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(implementation = Boolean.class)))
+    })
+    public boolean isSubscribed(
+            @MemberId Long memberId,
+            @RequestParam String deviceId) {
+        return pushService.isSubscribed(memberId, deviceId);
+    }
+
     @PostMapping("/subscribe")
     @Operation(
             summary = "푸시 토큰 구독 등록",
@@ -51,7 +62,7 @@ public class PushNotificationController {
     public void subscribe(
             @Parameter(hidden = true) @MemberId Long memberId,
             @RequestBody PushTokenRequest request) {
-        pushService.subscribe(memberId, request.token());
+        pushService.subscribe(memberId, request.deviceId(), request.token());
     }
 
     @PostMapping("/unsubscribe")
@@ -66,7 +77,7 @@ public class PushNotificationController {
     public void unsubscribe(
             @Parameter(hidden = true) @MemberId Long memberId,
             @RequestBody PushTokenRequest request) {
-        pushService.unsubscribe(memberId, request.token());
+        pushService.unsubscribe(memberId, request.deviceId(), request.token());
     }
 
 
