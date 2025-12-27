@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class FcmService implements PushService {
@@ -57,7 +59,13 @@ public class FcmService implements PushService {
     @Override
     @Transactional
     public void subscribe(Long memberId, String deviceId, String token) {
-        pushSubscriptionRepository.save(new PushSubscription(memberId, deviceId, token));
+        Optional<PushSubscription> byMemberIdAndDeviceId = pushSubscriptionRepository.findByMemberIdAndDeviceId(memberId, deviceId);
+        if (byMemberIdAndDeviceId.isPresent()) {
+            PushSubscription existingSubscription = byMemberIdAndDeviceId.get();
+            existingSubscription.updateToken(token);
+        } else {
+            pushSubscriptionRepository.save(new PushSubscription(memberId, deviceId, token));
+        }
     }
 
     @Override
