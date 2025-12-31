@@ -35,6 +35,21 @@ public class PushNotificationControllerV0 {
         return pushService.getVapidPublicKey();
     }
 
+    @GetMapping("/subscribed")
+    @Operation(
+            summary = "푸시 구독 상태 조회",
+            description = "인증된 회원이 푸시 알림을 구독 중인지 여부를 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "구독 상태 조회 완료",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(implementation = Boolean.class)))
+    })
+    public boolean isSubscribed(
+            @Parameter(hidden = true) @MemberId Long memberId,
+            @RequestParam String deviceId) {
+        return pushService.isSubscribed(memberId, deviceId);
+    }
+
     @PostMapping("/subscribe")
     @Operation(
             summary = "푸시 토큰 구독 등록",
@@ -47,7 +62,7 @@ public class PushNotificationControllerV0 {
     public void subscribe(
             @Parameter(hidden = true) @MemberId Long memberId,
             @RequestBody PushTokenRequest request) {
-        pushService.subscribe(memberId, request.token());
+        pushService.subscribe(memberId, request.deviceId(), request.token());
     }
 
     @PostMapping("/unsubscribe")
@@ -62,7 +77,7 @@ public class PushNotificationControllerV0 {
     public void unsubscribe(
             @Parameter(hidden = true) @MemberId Long memberId,
             @RequestBody PushTokenRequest request) {
-        pushService.unsubscribe(memberId, request.token());
+        pushService.unsubscribe(memberId, request.deviceId(), request.token());
     }
 
 
