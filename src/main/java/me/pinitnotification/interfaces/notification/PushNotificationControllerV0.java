@@ -12,14 +12,13 @@ import me.pinitnotification.domain.member.MemberId;
 import me.pinitnotification.interfaces.notification.dto.PushTokenRequest;
 import org.springframework.web.bind.annotation.*;
 
-@Deprecated
 @RestController
-@RequestMapping("/push")
+@RequestMapping("/v0/push")
 @Tag(name = "푸시 알림", description = "푸시 구독 및 VAPID 키 관련 API")
-public class PushNotificationController {
+public class PushNotificationControllerV0 {
     private final PushService pushService;
 
-    public PushNotificationController(PushService pushService) {
+    public PushNotificationControllerV0(PushService pushService) {
         this.pushService = pushService;
     }
 
