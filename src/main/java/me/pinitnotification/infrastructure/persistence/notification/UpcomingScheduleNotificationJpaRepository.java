@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface UpcomingScheduleNotificationJpaRepository extends JpaRepository<UpcomingScheduleNotificationEntity, Long> {
     Optional<UpcomingScheduleNotificationEntity> findByScheduleIdAndOwnerId(Long scheduleId, Long ownerId);
-
     boolean existsByScheduleIdAndOwnerId(Long scheduleId, Long ownerId);
-
     void deleteByScheduleIdAndOwnerId(Long scheduleId, Long ownerId);
 }
