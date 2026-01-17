@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
+        name = "push_subscription",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_deviceId_memberId",
