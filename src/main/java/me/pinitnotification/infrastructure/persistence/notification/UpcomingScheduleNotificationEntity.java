@@ -14,7 +14,8 @@ import java.util.UUID;
         name = "upcoming_schedule_notification",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_schedule_owner", columnNames = {"schedule_id", "owner_id"}),
-                @UniqueConstraint(name = "uk_idempotent_key", columnNames = {"idempotent_key"})
+                @UniqueConstraint(name = "uk_idempotent_key", columnNames = {"idempotent_key"}),
+                @UniqueConstraint(name = "uk_publicId", columnNames = {"public_id"})
         }
 )
 @Getter

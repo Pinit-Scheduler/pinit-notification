@@ -19,6 +19,10 @@ import java.util.UUID;
                 @UniqueConstraint(
                         name = "uk_deviceId_memberId",
                         columnNames = {"member_id", "device_id"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_publicId",
+                        columnNames = {"public_id"}
                 )
         }
 )
