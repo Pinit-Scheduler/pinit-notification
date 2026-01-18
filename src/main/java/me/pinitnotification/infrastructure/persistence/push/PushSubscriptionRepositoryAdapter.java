@@ -46,7 +46,6 @@ public class PushSubscriptionRepositoryAdapter implements PushSubscriptionReposi
 
     private PushSubscription toDomain(PushSubscriptionEntity entity) {
         return new PushSubscription(
-                entity.getId(),
                 entity.getPublicId(),
                 entity.getMemberId(),
                 entity.getDeviceId(),
@@ -57,7 +56,6 @@ public class PushSubscriptionRepositoryAdapter implements PushSubscriptionReposi
 
     private PushSubscriptionEntity toEntity(PushSubscription domain) {
         PushSubscriptionEntity entity = new PushSubscriptionEntity();
-        entity.setId(domain.getLegacyId());
         entity.setPublicId(domain.getId());
         entity.setMemberId(domain.getMemberId());
         entity.setDeviceId(domain.getDeviceId());

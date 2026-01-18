@@ -26,8 +26,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PushSubscriptionEntity {
-    private Long id;
-
     @Id
     @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "public_id", length = 36)

@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Getter
 public class PushSubscription {
-    private Long legacyId;
     private UUID id;
     private Long memberId;
     private String deviceId;
@@ -15,8 +14,7 @@ public class PushSubscription {
     private Instant modifiedAt;
     protected PushSubscription() {}
 
-    public PushSubscription(Long legacyId, UUID id, Long memberId, String deviceId, String token, Instant modifiedAt) {
-        this.legacyId = legacyId;
+    public PushSubscription(UUID id, Long memberId, String deviceId, String token, Instant modifiedAt) {
         this.id = id;
         this.memberId = memberId;
         this.deviceId = deviceId;
