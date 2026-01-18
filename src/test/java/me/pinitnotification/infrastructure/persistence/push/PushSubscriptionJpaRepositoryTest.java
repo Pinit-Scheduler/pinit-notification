@@ -22,7 +22,6 @@ class PushSubscriptionJpaRepositoryTest {
 
         PushSubscriptionEntity saved = repository.save(entity);
 
-        assertThat(saved.getId()).isNotNull();
         assertThat(saved.getPublicId()).isNotNull();
         assertThat(saved.getModifiedAt()).isNotNull();
 

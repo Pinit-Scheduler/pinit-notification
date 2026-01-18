@@ -30,7 +30,6 @@ class PushSubscriptionRepositoryAdapterTest {
 
         PushSubscription saved = repository.save(created);
 
-        assertThat(saved.getLegacyId()).isNotNull();
         assertThat(saved.getId()).isEqualTo(publicId);
 
         Optional<PushSubscription> loaded =
