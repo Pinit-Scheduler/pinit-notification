@@ -44,7 +44,7 @@ class NotificationDispatchQueryRepositoryAdapterTest {
         entityManager.clear();
 
         // when
-        List<NotificationDispatchItem> results = repository.findDueNotificationsWithTokens(Instant.parse("2024-06-01T10:00:00Z"));
+        List<NotificationDispatchItem> results = repository.findAllDueNotificationsWithTokens(Instant.parse("2024-06-01T10:00:00Z"));
 
         // then
         assertThat(results)

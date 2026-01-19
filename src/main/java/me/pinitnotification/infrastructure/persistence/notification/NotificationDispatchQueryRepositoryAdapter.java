@@ -32,7 +32,7 @@ public class NotificationDispatchQueryRepositoryAdapter implements NotificationD
     }
 
     @Override
-    public List<NotificationDispatchItem> findDueNotificationsWithTokens(Instant now) {
+    public List<NotificationDispatchItem> findAllDueNotificationsWithTokens(Instant now) {
         List<DispatchRow> rows = jdbcClient.sql(FIND_DUE_WITH_TOKENS_SQL)
                 .param(now.toString())
                 .query((rs, rowNum) -> new DispatchRow(

@@ -42,7 +42,7 @@ public class NotificationDispatchScheduler {
     @Transactional
     public void dispatchDueNotifications() {
         Instant now = Instant.now(clock);
-        List<NotificationDispatchItem> dispatchItems = dispatchQueryRepository.findDueNotificationsWithTokens(now);
+        List<NotificationDispatchItem> dispatchItems = dispatchQueryRepository.findAllDueNotificationsWithTokens(now);
 
         if (dispatchItems.isEmpty()) {
             return;
