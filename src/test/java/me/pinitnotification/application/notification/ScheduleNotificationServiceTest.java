@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -50,7 +51,9 @@ class ScheduleNotificationServiceTest {
 
     @Test
     void handleUpcomingUpdated_updatesExistingNotification() {
-        UpcomingScheduleNotification existing = new UpcomingScheduleNotification(ownerId, scheduleId, "title", "2024-01-01T00:00Z", "old-key");
+        UpcomingScheduleNotification existing = new UpcomingScheduleNotification(
+                ownerId, scheduleId, "title", Instant.parse("2024-01-01T00:00:00Z"), "old-key"
+        );
         when(notificationRepository.findByScheduleIdAndOwnerId(scheduleId, ownerId)).thenReturn(Optional.of(existing));
 
         UpcomingUpdatedCommand command = new UpcomingUpdatedCommand(
@@ -62,7 +65,7 @@ class ScheduleNotificationServiceTest {
         verify(notificationRepository).updateScheduleStartTimeAndIdempotentKey(
                 scheduleId,
                 ownerId,
-                "2024-02-01T12:00Z",
+                Instant.parse("2024-02-01T12:00:00Z"),
                 "new-key"
         );
         verify(notificationRepository, never()).save(any());
@@ -87,7 +90,7 @@ class ScheduleNotificationServiceTest {
         assertThat(saved.getOwnerId()).isEqualTo(ownerId);
         assertThat(saved.getScheduleId()).isEqualTo(scheduleId);
         assertThat(saved.getScheduleTitle()).isEqualTo("title");
-        assertThat(saved.getScheduleStartTime()).isEqualTo("2024-04-01T09:30Z");
+        assertThat(saved.getScheduleStartTime()).isEqualTo(Instant.parse("2024-04-01T09:30:00Z"));
         assertThat(saved.getIdempotentKey()).isEqualTo("key-123");
     }
 
@@ -114,8 +117,26 @@ class ScheduleNotificationServiceTest {
         verify(notificationRepository).save(notificationCaptor.capture());
         UpcomingScheduleNotification saved = notificationCaptor.getValue();
         assertThat(saved.getScheduleTitle()).isEqualTo("canceled title");
-        assertThat(saved.getScheduleStartTime()).isEqualTo("2024-05-10T10:00:00Z");
+        assertThat(saved.getScheduleStartTime()).isEqualTo(Instant.parse("2024-05-10T10:00:00Z"));
         assertThat(saved.getIdempotentKey()).isEqualTo("cancel-key");
+    }
+
+    @Test
+    void handleUpcomingUpdated_normalizesOffsetToUtcWhenCreating() {
+        when(notificationRepository.findByScheduleIdAndOwnerId(scheduleId, ownerId)).thenReturn(Optional.empty());
+        when(scheduleQueryPort.getScheduleBasics(scheduleId, ownerId))
+                .thenReturn(new ScheduleBasics(scheduleId, ownerId, "title", "2024-03-01T00:00:00Z"));
+        when(idGenerator.generate()).thenReturn(java.util.UUID.randomUUID());
+
+        UpcomingUpdatedCommand command = new UpcomingUpdatedCommand(
+                ownerId, scheduleId, OffsetDateTime.parse("2024-04-01T18:30:00+09:00"), "key-utc"
+        );
+
+        scheduleNotificationService.handleUpcomingUpdated(command);
+
+        verify(notificationRepository).save(notificationCaptor.capture());
+        UpcomingScheduleNotification saved = notificationCaptor.getValue();
+        assertThat(saved.getScheduleStartTime()).isEqualTo(Instant.parse("2024-04-01T09:30:00Z"));
     }
 
     @Test

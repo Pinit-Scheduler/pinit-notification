@@ -8,10 +8,13 @@ import me.pinitnotification.application.notification.query.ScheduleQueryPort;
 import me.pinitnotification.domain.notification.UpcomingScheduleNotification;
 import me.pinitnotification.domain.notification.UpcomingScheduleNotificationRepository;
 import me.pinitnotification.domain.shared.IdGenerator;
+import me.pinitnotification.domain.shared.ScheduleStartTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 @Service
 public class ScheduleNotificationService {
@@ -39,7 +42,7 @@ public class ScheduleNotificationService {
                                 resolveScheduleStartTime(command, existing),
                                 command.idempotentKey()
                         ),
-                        () -> notificationRepository.save(buildNotification(command.ownerId(), command.scheduleId(), command.idempotentKey(), toStringValue(command.newUpcomingTime())))
+                        () -> notificationRepository.save(buildNotification(command.ownerId(), command.scheduleId(), command.idempotentKey(), toInstantValue(command.newUpcomingTime())))
                 );
     }
 
@@ -79,9 +82,11 @@ public class ScheduleNotificationService {
         }
     }
 
-    private UpcomingScheduleNotification buildNotification(Long ownerId, Long scheduleId, String idempotentKey, String scheduleStartTimeOverride) {
+    private UpcomingScheduleNotification buildNotification(Long ownerId, Long scheduleId, String idempotentKey, Instant scheduleStartTimeOverride) {
         ScheduleBasics basics = scheduleQueryPort.getScheduleBasics(scheduleId, ownerId);
-        String scheduleStartTime = scheduleStartTimeOverride != null ? scheduleStartTimeOverride : basics.designatedStartTime();
+        Instant scheduleStartTime = scheduleStartTimeOverride != null
+                ? scheduleStartTimeOverride
+                : ScheduleStartTimeFormatter.parse(basics.designatedStartTime());
 
         return new UpcomingScheduleNotification(
                 idGenerator.generate(),
@@ -93,12 +98,12 @@ public class ScheduleNotificationService {
         );
     }
 
-    private String toStringValue(java.time.OffsetDateTime dateTime) {
-        return dateTime == null ? null : dateTime.toString();
+    private Instant toInstantValue(java.time.OffsetDateTime dateTime) {
+        return dateTime == null ? null : dateTime.toInstant();
     }
 
-    private String resolveScheduleStartTime(UpcomingUpdatedCommand command, UpcomingScheduleNotification existing) {
-        String newStartTime = toStringValue(command.newUpcomingTime());
+    private Instant resolveScheduleStartTime(UpcomingUpdatedCommand command, UpcomingScheduleNotification existing) {
+        Instant newStartTime = toInstantValue(command.newUpcomingTime());
         return newStartTime != null ? newStartTime : existing.getScheduleStartTime();
     }
 }

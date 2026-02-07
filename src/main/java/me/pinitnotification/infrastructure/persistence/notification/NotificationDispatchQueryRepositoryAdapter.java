@@ -6,6 +6,7 @@ import me.pinitnotification.domain.notification.UpcomingScheduleNotification;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 
@@ -34,16 +35,21 @@ public class NotificationDispatchQueryRepositoryAdapter implements NotificationD
     @Override
     public List<NotificationDispatchItem> findAllDueNotificationsWithTokens(Instant now) {
         List<DispatchRow> rows = jdbcClient.sql(FIND_DUE_WITH_TOKENS_SQL)
-                .param(now.toString())
-                .query((rs, rowNum) -> new DispatchRow(
-                        UUID.fromString(rs.getString("public_id")),
-                        rs.getLong("owner_id"),
-                        rs.getLong("schedule_id"),
-                        rs.getString("schedule_title"),
-                        rs.getString("schedule_start_time"),
-                        rs.getString("idempotent_key"),
-                        rs.getString("token")
-                ))
+                .param(Timestamp.from(now))
+                .query((rs, rowNum) -> {
+                    Timestamp scheduleStartAt = rs.getTimestamp("schedule_start_time");
+                    Instant scheduleStartTime = scheduleStartAt == null ? null : scheduleStartAt.toInstant();
+
+                    return new DispatchRow(
+                            UUID.fromString(rs.getString("public_id")),
+                            rs.getLong("owner_id"),
+                            rs.getLong("schedule_id"),
+                            rs.getString("schedule_title"),
+                            scheduleStartTime,
+                            rs.getString("idempotent_key"),
+                            rs.getString("token")
+                    );
+                })
                 .list();
 
         if (rows.isEmpty()) {
@@ -85,7 +91,7 @@ public class NotificationDispatchQueryRepositoryAdapter implements NotificationD
             Long ownerId,
             Long scheduleId,
             String scheduleTitle,
-            String scheduleStartTime,
+            Instant scheduleStartTime,
             String idempotentKey,
             String token
     ) {

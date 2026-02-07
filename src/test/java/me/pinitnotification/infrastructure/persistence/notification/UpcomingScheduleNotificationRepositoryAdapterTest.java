@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ class UpcomingScheduleNotificationRepositoryAdapterTest {
                 1L,
                 2L,
                 "title",
-                "2025-01-01T00:00:00Z",
+                Instant.parse("2025-01-01T00:00:00Z"),
                 "key-1"
         );
 
@@ -49,17 +50,17 @@ class UpcomingScheduleNotificationRepositoryAdapterTest {
                 1L,
                 2L,
                 "title",
-                "2025-01-01T00:00:00Z",
+                Instant.parse("2025-01-01T00:00:00Z"),
                 "key-1"
         ));
 
-        repository.updateScheduleStartTimeAndIdempotentKey(2L, 1L, "2025-01-02T01:00:00Z", "key-2");
+        repository.updateScheduleStartTimeAndIdempotentKey(2L, 1L, Instant.parse("2025-01-02T01:00:00Z"), "key-2");
 
         Optional<UpcomingScheduleNotification> loaded =
                 repository.findByScheduleIdAndOwnerId(2L, 1L);
 
         assertThat(loaded).isPresent();
-        assertThat(loaded.get().getScheduleStartTime()).isEqualTo("2025-01-02T01:00:00Z");
+        assertThat(loaded.get().getScheduleStartTime()).isEqualTo(Instant.parse("2025-01-02T01:00:00Z"));
         assertThat(loaded.get().getIdempotentKey()).isEqualTo("key-2");
     }
 }

@@ -3,6 +3,13 @@ task:
     host: localhost
     port: 9090
 
+spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
 path:
   key:
     firebase: ${HOME}/pinit/keys/pinit-firebase-key.json
