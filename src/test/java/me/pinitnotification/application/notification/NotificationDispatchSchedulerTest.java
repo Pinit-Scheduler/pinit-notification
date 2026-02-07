@@ -41,7 +41,9 @@ class NotificationDispatchSchedulerTest {
 
     @Test
     void dispatchDueNotifications_sendsAndDeletesNotificationsFromQuery() {
-        UpcomingScheduleNotification notification = new UpcomingScheduleNotification(1L, 10L, "title", "2024-06-01T09:50Z", "key-1");
+        UpcomingScheduleNotification notification = new UpcomingScheduleNotification(
+                1L, 10L, "title", Instant.parse("2024-06-01T09:50:00Z"), "key-1"
+        );
 
         when(dispatchQueryRepository.findAllDueNotificationsWithTokens(any()))
                 .thenReturn(List.of(new NotificationDispatchItem(notification, List.of("token-1", "token-2"))));
@@ -57,7 +59,9 @@ class NotificationDispatchSchedulerTest {
 
     @Test
     void dispatchDueNotifications_deletesEvenWhenNoTokens() {
-        UpcomingScheduleNotification past = new UpcomingScheduleNotification(2L, 20L, "title", "2024-06-01T09:00Z", "key-3");
+        UpcomingScheduleNotification past = new UpcomingScheduleNotification(
+                2L, 20L, "title", Instant.parse("2024-06-01T09:00:00Z"), "key-3"
+        );
 
         when(dispatchQueryRepository.findAllDueNotificationsWithTokens(any()))
                 .thenReturn(List.of(new NotificationDispatchItem(past, List.of())));
@@ -71,7 +75,9 @@ class NotificationDispatchSchedulerTest {
 
     @Test
     void dispatchDueNotifications_collectsInvalidTokensAndDeletesInBatch() {
-        UpcomingScheduleNotification notification = new UpcomingScheduleNotification(3L, 30L, "title", "2024-06-01T09:30Z", "key-4");
+        UpcomingScheduleNotification notification = new UpcomingScheduleNotification(
+                3L, 30L, "title", Instant.parse("2024-06-01T09:30:00Z"), "key-4"
+        );
 
         when(dispatchQueryRepository.findAllDueNotificationsWithTokens(any()))
                 .thenReturn(List.of(new NotificationDispatchItem(notification, List.of("token-1", "token-2", "token-3"))));
