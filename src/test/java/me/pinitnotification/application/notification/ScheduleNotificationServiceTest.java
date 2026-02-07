@@ -59,8 +59,12 @@ class ScheduleNotificationServiceTest {
 
         scheduleNotificationService.handleUpcomingUpdated(command);
 
-        assertThat(existing.getScheduleStartTime()).isEqualTo("2024-02-01T12:00Z");
-        assertThat(existing.getIdempotentKey()).isEqualTo("new-key");
+        verify(notificationRepository).updateScheduleStartTimeAndIdempotentKey(
+                scheduleId,
+                ownerId,
+                "2024-02-01T12:00Z",
+                "new-key"
+        );
         verify(notificationRepository, never()).save(any());
         verifyNoInteractions(scheduleQueryPort);
     }
