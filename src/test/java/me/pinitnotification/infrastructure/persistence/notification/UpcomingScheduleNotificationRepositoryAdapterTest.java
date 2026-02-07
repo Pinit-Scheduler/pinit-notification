@@ -40,4 +40,26 @@ class UpcomingScheduleNotificationRepositoryAdapterTest {
         assertThat(loaded).isPresent();
         assertThat(loaded.get().getId()).isEqualTo(publicId);
     }
+
+    @Test
+    void updatesScheduleStartTimeAndIdempotentKey() {
+        UUID publicId = UUID.randomUUID();
+        repository.save(new UpcomingScheduleNotification(
+                publicId,
+                1L,
+                2L,
+                "title",
+                "2025-01-01T00:00:00Z",
+                "key-1"
+        ));
+
+        repository.updateScheduleStartTimeAndIdempotentKey(2L, 1L, "2025-01-02T01:00:00Z", "key-2");
+
+        Optional<UpcomingScheduleNotification> loaded =
+                repository.findByScheduleIdAndOwnerId(2L, 1L);
+
+        assertThat(loaded).isPresent();
+        assertThat(loaded.get().getScheduleStartTime()).isEqualTo("2025-01-02T01:00:00Z");
+        assertThat(loaded.get().getIdempotentKey()).isEqualTo("key-2");
+    }
 }

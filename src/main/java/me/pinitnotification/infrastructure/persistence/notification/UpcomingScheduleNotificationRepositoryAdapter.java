@@ -2,6 +2,8 @@ package me.pinitnotification.infrastructure.persistence.notification;
 
 import me.pinitnotification.domain.notification.UpcomingScheduleNotification;
 import me.pinitnotification.domain.notification.UpcomingScheduleNotificationRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public class UpcomingScheduleNotificationRepositoryAdapter implements UpcomingScheduleNotificationRepository {
+    private static final Logger log = LoggerFactory.getLogger(UpcomingScheduleNotificationRepositoryAdapter.class);
+
     private final UpcomingScheduleNotificationJpaRepository jpaRepository;
 
     public UpcomingScheduleNotificationRepositoryAdapter(UpcomingScheduleNotificationJpaRepository jpaRepository) {
@@ -37,6 +41,14 @@ public class UpcomingScheduleNotificationRepositoryAdapter implements UpcomingSc
     public UpcomingScheduleNotification save(UpcomingScheduleNotification notification) {
         UpcomingScheduleNotificationEntity saved = jpaRepository.save(toEntity(notification));
         return toDomain(saved);
+    }
+
+    @Override
+    public void updateScheduleStartTimeAndIdempotentKey(Long scheduleId, Long ownerId, String scheduleStartTime, String idempotentKey) {
+        int updatedRows = jpaRepository.updateScheduleStartTimeAndIdempotentKey(scheduleId, ownerId, scheduleStartTime, idempotentKey);
+        if (updatedRows == 0) {
+            log.debug("Skip updating notification. scheduleId={}, ownerId={} not found", scheduleId, ownerId);
+        }
     }
 
     @Override
