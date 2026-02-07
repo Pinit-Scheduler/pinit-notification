@@ -65,13 +65,27 @@ class NotificationDispatchQueryRepositoryAdapterTest {
         assertThat(withoutTokens.tokens()).isEmpty();
     }
 
+    @Test
+    void returnsNotificationWhenStartTimeEqualsNow() {
+        notificationJpaRepository.save(notification(1L, 99L, "2024-06-01T10:00:00Z"));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<NotificationDispatchItem> results = repository.findAllDueNotificationsWithTokens(Instant.parse("2024-06-01T10:00:00Z"));
+
+        assertThat(results)
+                .extracting(item -> item.notification().getScheduleId())
+                .contains(99L);
+    }
+
     private UpcomingScheduleNotificationEntity notification(Long ownerId, Long scheduleId, String startTimeIso) {
         UpcomingScheduleNotificationEntity entity = new UpcomingScheduleNotificationEntity();
         entity.setPublicId(UUID.randomUUID());
         entity.setOwnerId(ownerId);
         entity.setScheduleId(scheduleId);
         entity.setScheduleTitle("title-" + scheduleId);
-        entity.setScheduleStartTime(startTimeIso);
+        entity.setScheduleStartTime(Instant.parse(startTimeIso));
         entity.setIdempotentKey("key-" + scheduleId);
         return entity;
     }
