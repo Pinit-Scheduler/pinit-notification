@@ -7,6 +7,7 @@ import me.gg.pinit.pinittask.grpc.GetScheduleResponse;
 import me.gg.pinit.pinittask.grpc.ScheduleGrpcServiceGrpc;
 import me.pinitnotification.application.notification.query.ScheduleBasics;
 import me.pinitnotification.application.notification.query.ScheduleQueryPort;
+import me.pinitnotification.domain.shared.ScheduleStartTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,6 @@ public class ScheduleGrpcClient implements ScheduleQueryPort {
 
     private String toIsoString(Timestamp timestamp) {
         Instant instant = Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
-        return instant.toString();
+        return ScheduleStartTimeFormatter.format(instant);
     }
 }
