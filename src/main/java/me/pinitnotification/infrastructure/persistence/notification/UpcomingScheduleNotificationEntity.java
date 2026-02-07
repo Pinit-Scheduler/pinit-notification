@@ -7,6 +7,7 @@ import me.pinitnotification.infrastructure.persistence.UuidV7Generator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -35,7 +36,7 @@ public class UpcomingScheduleNotificationEntity {
     @Column(name = "schedule_title", nullable = false)
     private String scheduleTitle;
     @Column(name = "schedule_start_time", nullable = false)
-    private String scheduleStartTime;
+    private Instant scheduleStartTime;
     @Column(name = "idempotent_key", nullable = false)
     private String idempotentKey;
 
