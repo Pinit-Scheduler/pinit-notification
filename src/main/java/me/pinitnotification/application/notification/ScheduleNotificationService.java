@@ -33,7 +33,12 @@ public class ScheduleNotificationService {
     public void handleUpcomingUpdated(UpcomingUpdatedCommand command) {
         notificationRepository.findByScheduleIdAndOwnerId(command.scheduleId(), command.ownerId())
                 .ifPresentOrElse(
-                        existing -> existing.updateScheduleStartTime(resolveScheduleStartTime(command, existing), command.idempotentKey()),
+                        existing -> notificationRepository.updateScheduleStartTimeAndIdempotentKey(
+                                command.scheduleId(),
+                                command.ownerId(),
+                                resolveScheduleStartTime(command, existing),
+                                command.idempotentKey()
+                        ),
                         () -> notificationRepository.save(buildNotification(command.ownerId(), command.scheduleId(), command.idempotentKey(), toStringValue(command.newUpcomingTime())))
                 );
     }
