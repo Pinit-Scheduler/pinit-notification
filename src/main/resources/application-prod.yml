@@ -7,6 +7,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate    # dev: update, create-drop / prod: validate 추천
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
     open-in-view: false
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/pinit_notification?characterEncoding=UTF-8
