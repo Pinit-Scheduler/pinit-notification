@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +45,13 @@ public class UpcomingScheduleNotificationRepositoryAdapter implements UpcomingSc
     }
 
     @Override
-    public void updateScheduleStartTimeAndIdempotentKey(Long scheduleId, Long ownerId, String scheduleStartTime, String idempotentKey) {
-        int updatedRows = jpaRepository.updateScheduleStartTimeAndIdempotentKey(scheduleId, ownerId, scheduleStartTime, idempotentKey);
+    public void updateScheduleStartTimeAndIdempotentKey(Long scheduleId, Long ownerId, Instant scheduleStartTime, String idempotentKey) {
+        int updatedRows = jpaRepository.updateScheduleStartTimeAndIdempotentKey(
+                scheduleId,
+                ownerId,
+                scheduleStartTime,
+                idempotentKey
+        );
         if (updatedRows == 0) {
             log.debug("Skip updating notification. scheduleId={}, ownerId={} not found", scheduleId, ownerId);
         }
